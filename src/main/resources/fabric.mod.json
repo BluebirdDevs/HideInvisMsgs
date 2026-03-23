@@ -22,8 +22,8 @@
     "hideinvismsgs.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=${loader_version}",
+    "fabricloader": ">=0.18.4",
     "fabric-api": "*",
-    "minecraft": ">=${minecraft_version}"
+    "minecraft": "~26.1-"
   }
 }
