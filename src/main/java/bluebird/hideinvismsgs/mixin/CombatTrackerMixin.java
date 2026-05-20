@@ -1,20 +1,23 @@
 package bluebird.hideinvismsgs.mixin;
 
 import bluebird.hideinvismsgs.HideInvisMsgs;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(CombatTracker.class)
 public class CombatTrackerMixin {
+    @Shadow
+    @Final
+    private LivingEntity mob;
+
     @Redirect(method = "getDeathMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getDisplayName()Lnet/minecraft/network/chat/Component;"))
     public Component hideInvisMsgs$getDisplayName(LivingEntity livingEntity) {
         return HideInvisMsgs.hideinvismsgs$ObfuscateOrNormalDeaths(livingEntity);
@@ -33,5 +36,10 @@ public class CombatTrackerMixin {
     @Redirect(method = "getMessageForAssistedFall", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getDisplayName()Lnet/minecraft/network/chat/Component;"))
     public Component hideInvisMsgs$getMessageForAssistedFall(LivingEntity livingEntity) {
         return HideInvisMsgs.hideinvismsgs$ObfuscateOrNormalDeaths(livingEntity);
+    }
+
+    @Redirect(method = "getMessageForAssistedFall", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getDisplayName()Lnet/minecraft/network/chat/Component;"))
+    public Component hideInvisMsgs$getMessageForAssistedFall(ItemStack item) {
+        return HideInvisMsgs.hideinvismsgs$ObfuscateOrNormalItem(item, mob);
     }
 }

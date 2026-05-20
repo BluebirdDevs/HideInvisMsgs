@@ -8,17 +8,29 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.scores.PlayerTeam;
+import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(DamageSource.class)
 public class DamageSourceMixin {
+    @Shadow
+    @Final
+    private @Nullable Entity causingEntity;
 
     @Redirect(method = "getLocalizedDeathMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getDisplayName()Lnet/minecraft/network/chat/Component;"))
     public Component hideInvisMsgs$hideInvisDeaths(LivingEntity livingEntity) {
         return HideInvisMsgs.hideinvismsgs$ObfuscateOrNormalDeaths(livingEntity);
+    }
+
+    @Redirect(method = "getLocalizedDeathMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getDisplayName()Lnet/minecraft/network/chat/Component;"))
+    public Component hideInvisMsgs$getMessageForAssistedFall(ItemStack item) {
+        return HideInvisMsgs.hideinvismsgs$ObfuscateOrNormalItem(item, causingEntity);
     }
 
     @Redirect(

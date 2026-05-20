@@ -3,3 +3,4 @@ Obfuscates death messages and kill messages that invisible players get. Both def
 - /gamerule hideinvismsgs:obfuscate_invis_deaths <True/False>
 - /gamerule hideinvismsgs:obfuscate_invis_kills <True/False>
 - /gamerule hideinvismsgs:show_invis_team_name <True/False>
+- /gamerule hideinvismsgs:obfuscate_weapon_name <True/False>

@@ -3,12 +3,18 @@ package bluebird.hideinvismsgs;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleCategory;
 import net.minecraft.world.scores.PlayerTeam;
@@ -22,6 +28,7 @@ public class HideInvisMsgs implements ModInitializer {
     private static final Identifier GAMERULE_IDENTIFIER = Identifier.fromNamespaceAndPath("hideinvismsgs","obfuscate_invis_deaths");
     private static final Identifier GAMERULE_IDENTIFIER_2 = Identifier.fromNamespaceAndPath("hideinvismsgs","obfuscate_invis_kills");
     private static final Identifier GAMERULE_IDENTIFIER_3 = Identifier.fromNamespaceAndPath("hideinvismsgs","show_invis_team_name");
+    private static final Identifier GAMERULE_IDENTIFIER_4 = Identifier.fromNamespaceAndPath("hideinvismsgs","obfuscate_weapon_name");
 
     public static final GameRule<Boolean> OBFUSCATED_INVIS_DEATHS = GameRuleBuilder
             .forBoolean(true)
@@ -35,13 +42,40 @@ public class HideInvisMsgs implements ModInitializer {
             .forBoolean(true)
             .category(GameRuleCategory.PLAYER)
             .buildAndRegister(GAMERULE_IDENTIFIER_3);
+    public static final GameRule<Boolean> OBFUSCATED_WEAPON_NAME = GameRuleBuilder
+            .forBoolean(true)
+            .category(GameRuleCategory.PLAYER)
+            .buildAndRegister(GAMERULE_IDENTIFIER_4);
 
     public void onInitialize() {
-        LOGGER.info("HideInvisDeaths initialed");
     }
 
     public static Component hideinvismsgs$ObfuscateOrNormalDeaths(LivingEntity livingEntity) {
         return hideinvismsgs$ObfuscateOrNormalDeaths((Entity) livingEntity);
+    }
+
+    public static Component hideinvismsgs$ObfuscateOrNormalItem(ItemStack item, Entity mob) {
+        boolean showItem = false;
+        if (mob == null) return null;
+        if (mob.level() instanceof ServerLevel serverLevel) {
+            showItem = serverLevel
+                    .getGameRules()
+                    .get(HideInvisMsgs.OBFUSCATED_WEAPON_NAME);
+        }
+        if (showItem && mob instanceof Player && mob.isInvisible()) {
+            ItemStack newItem = item.copy();
+            MutableComponent hoverItem = Component.literal("Obfuscated").withStyle(ChatFormatting.OBFUSCATED);
+            if (newItem.has(DataComponents.CUSTOM_NAME)) {
+                newItem.set(DataComponents.CUSTOM_NAME, Component.literal("Obfuscated").withStyle(ChatFormatting.OBFUSCATED));
+                hoverItem.withStyle(ChatFormatting.ITALIC);
+            }
+            MutableComponent result = ComponentUtils.wrapInSquareBrackets(hoverItem);
+            if (!newItem.isEmpty()) {
+                result.withStyle(newItem.getRarity().color()).withStyle((s) -> s.withHoverEvent(new HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(newItem))));
+            }
+            return result;
+        }
+        return item.getDisplayName();
     }
 
 
