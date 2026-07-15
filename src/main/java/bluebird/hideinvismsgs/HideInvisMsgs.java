@@ -28,6 +28,7 @@ public class HideInvisMsgs implements ModInitializer {
     private static final Identifier GAMERULE_IDENTIFIER_2 = Identifier.fromNamespaceAndPath("hideinvismsgs","obfuscate_invis_kills");
     private static final Identifier GAMERULE_IDENTIFIER_3 = Identifier.fromNamespaceAndPath("hideinvismsgs","show_invis_team_name");
     private static final Identifier GAMERULE_IDENTIFIER_4 = Identifier.fromNamespaceAndPath("hideinvismsgs","obfuscate_weapon_name");
+    private static final Identifier GAMERULE_IDENTIFIER_5 = Identifier.fromNamespaceAndPath("hideinvismsgs","obfuscate_dead_leave_msg");
 
     public static final GameRule<Boolean> OBFUSCATED_INVIS_DEATHS = GameRuleBuilder
             .forBoolean(true)
@@ -45,6 +46,10 @@ public class HideInvisMsgs implements ModInitializer {
             .forBoolean(true)
             .category(GameRuleCategory.PLAYER)
             .buildAndRegister(GAMERULE_IDENTIFIER_4);
+    public static final GameRule<Boolean> OBFUSCATED_LEAVE_MSG = GameRuleBuilder
+            .forBoolean(true)
+            .category(GameRuleCategory.PLAYER)
+            .buildAndRegister(GAMERULE_IDENTIFIER_5);
 
     public void onInitialize() {
     }
