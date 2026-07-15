@@ -4,8 +4,9 @@
   "package": "bluebird.hideinvismsgs.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CombatTrackerMixin",
     "DamageSourceMixin",
-    "CombatTrackerMixin"
+    "ServerGamePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1
