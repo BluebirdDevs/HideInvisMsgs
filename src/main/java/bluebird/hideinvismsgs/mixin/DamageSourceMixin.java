@@ -9,13 +9,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.scores.PlayerTeam;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(DamageSource.class)
 public class DamageSourceMixin {
@@ -31,6 +34,17 @@ public class DamageSourceMixin {
     @Redirect(method = "getLocalizedDeathMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getDisplayName()Lnet/minecraft/network/chat/Component;"))
     public Component hideInvisMsgs$getMessageForAssistedFall(ItemStack item) {
         return HideInvisMsgs.hideinvismsgs$ObfuscateOrNormalItem(item, causingEntity);
+    }
+
+    @Inject(method = "getLocalizedDeathMessage", at = @At("RETURN"), cancellable = true)
+    public void hideInvisMsgs$hideDeathCause(LivingEntity victim, CallbackInfoReturnable<Component> cir) {
+        GameRules rules = victim.level().getServer().getGameRules();
+        boolean hideMsg = causingEntity != null && causingEntity.isInvisible() && rules.get(HideInvisMsgs.HIDE_DEATH_CAUSE);
+        if (hideMsg) {
+            cir.setReturnValue(Component.empty()
+                    .append(victim.isInvisible() && rules.get(HideInvisMsgs.HIDE_DEATH_CAUSE) ? Component.literal("Obfuscated").withStyle(ChatFormatting.OBFUSCATED) : victim.getDisplayName())
+                    .append(Component.literal(" was Slain.")));
+        }
     }
 
     @Redirect(
