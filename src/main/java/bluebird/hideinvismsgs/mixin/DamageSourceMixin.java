@@ -38,7 +38,7 @@ public class DamageSourceMixin {
 
     @Inject(method = "getLocalizedDeathMessage", at = @At("RETURN"), cancellable = true)
     public void hideInvisMsgs$hideDeathCause(LivingEntity victim, CallbackInfoReturnable<Component> cir) {
-        GameRules rules = victim.level().getServer().getGameRules();
+        GameRules rules = victim.level().getServer().getWorldData().getGameRules();
         boolean hideMsg = causingEntity != null && causingEntity.isInvisible() && rules.get(HideInvisMsgs.HIDE_DEATH_CAUSE);
         if (hideMsg) {
             cir.setReturnValue(Component.empty()

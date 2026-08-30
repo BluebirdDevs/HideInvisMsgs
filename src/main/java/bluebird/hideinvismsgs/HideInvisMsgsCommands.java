@@ -17,7 +17,7 @@ public class HideInvisMsgsCommands {
         MinecraftServer server = HideInvisMsgs.minecraftServer;
         GameRule<?> rule = getGameRule(key);
         try {
-            server.getGameRules().set((GameRule<Boolean>) rule, value, server);
+            server.getWorldData().getGameRules().set((GameRule<Boolean>) rule, value, server);
         } catch (Exception e) {
             HideInvisMsgs.LOGGER.warn("Failed to set preset value for " + key + ": " + e.getMessage());
         }
@@ -38,7 +38,7 @@ public class HideInvisMsgsCommands {
         }
 
         MinecraftServer server = HideInvisMsgs.minecraftServer;
-        server.getGameRules().set((GameRule<Boolean>) rule, value, server);
+        server.getWorldData().getGameRules().set((GameRule<Boolean>) rule, value, server);
 
         source.getSource().sendSuccess(() -> Component.literal(String.format("Set %s to: %b", gamerule, value)), true);
         return 1;
@@ -50,7 +50,7 @@ public class HideInvisMsgsCommands {
             source.getSource().sendFailure(Component.literal(String.format("%s is not a valid rule", gamerule)));
             return 0;
         }
-        source.getSource().sendSuccess(() -> Component.literal(String.format("%s is currently: %b", gamerule, HideInvisMsgs.minecraftServer.getGameRules().get((GameRule<Boolean>) getGameRule(gamerule)))), false);
+        source.getSource().sendSuccess(() -> Component.literal(String.format("%s is currently: %b", gamerule, HideInvisMsgs.minecraftServer.getWorldData().getGameRules().get((GameRule<Boolean>) getGameRule(gamerule)))), false);
         return 1;
     }
 
